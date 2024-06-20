@@ -1,5 +1,4 @@
 import Navbar from '@/components/Navbar/Navbar';
-import { SignOutButton } from '@clerk/nextjs';
 import React, { ReactNode } from 'react';
 
 const layout = ({ children }: { children: ReactNode }) => {
