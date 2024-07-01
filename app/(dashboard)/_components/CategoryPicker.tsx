@@ -5,7 +5,7 @@ import { TransactionType } from '@/lib/types';
 import { Category } from '@prisma/client';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useState } from 'react';
-import CreateCateroyDialog from './CreateCateroyDialog';
+import CreateCategoryDialog from './CreateCateroyDialog';
 import { Check, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -54,7 +54,7 @@ const CategoryPicker = ({ type, onChange }: Props) => {
           }}
         >
           <CommandInput placeholder="Search category" />
-          <CreateCateroyDialog type={type} successCallback={successCallback} />
+          <CreateCategoryDialog type={type} successCallback={successCallback} />
           <CommandEmpty>
             <p>Category not found!</p>
             <p className="text-xs text-muted-foreground ">Tip: Create a new category.</p>

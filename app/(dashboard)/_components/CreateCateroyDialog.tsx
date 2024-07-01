@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TransactionType } from '@/lib/types';
@@ -10,12 +10,12 @@ import { cn } from '@/lib/utils';
 import { CreateCategorySchema, CreateCategorySchemaType } from '@/schema/categories';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleOff, Loader2, PlusSquare } from 'lucide-react';
-import { useCallback, useState } from 'react';
-import { Form, useForm } from 'react-hook-form';
+import React, { ReactNode, useCallback, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { CreateCategory } from '../_actions/categories';
+import { CreateCategory } from '@/app/(dashboard)/_actions/categories';
 import { Category } from '@prisma/client';
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
@@ -23,8 +23,10 @@ import { useTheme } from 'next-themes';
 interface Props {
   type: TransactionType;
   successCallback: (category: Category) => void;
+  trigger?: ReactNode;
 }
-const CreateCateroyDialog = ({ type, successCallback }: Props) => {
+
+function CreateCategoryDialog({ type, successCallback, trigger }: Props) {
   const [open, setOpen] = useState(false);
   const form = useForm<CreateCategorySchemaType>({
     resolver: zodResolver(CreateCategorySchema),
@@ -44,8 +46,9 @@ const CreateCateroyDialog = ({ type, successCallback }: Props) => {
         icon: '',
         type
       });
-      toast.success(`Category ${data.name} created successfully! 🎉`, {
-        id: 'created-category'
+
+      toast.success(`Category ${data.name} created successfully 🎉`, {
+        id: 'create-category'
       });
 
       successCallback(data);
@@ -57,18 +60,18 @@ const CreateCateroyDialog = ({ type, successCallback }: Props) => {
       setOpen(prev => !prev);
     },
     onError: () => {
-      toast.error('Something went wrong!', {
-        id: 'created-category'
+      toast.error('Something went wrong', {
+        id: 'create-category'
       });
     }
   });
 
   const onSubmit = useCallback(
-    (value: CreateCategorySchemaType) => {
+    (values: CreateCategorySchemaType) => {
       toast.loading('Creating category...', {
-        id: 'created-category'
+        id: 'create-category'
       });
-      mutate(value);
+      mutate(values);
     },
     [mutate]
   );
@@ -76,16 +79,23 @@ const CreateCateroyDialog = ({ type, successCallback }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={'ghost'} className="flex border-separate items-center justify-start rounded-none border-b px-3 py-3 text-muted-foreground">
-          <PlusSquare className="mr-2 h-4 w-4" /> Create new
-        </Button>
+        {trigger ? (
+          trigger
+        ) : (
+          <Button variant={'ghost'} className="flex border-separate items-center justify-start roudned-none border-b px-3 py-3 text-muted-foreground">
+            <PlusSquare className="mr-2 h-4 w-4" />
+            Create new
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            Create <span className={cn('m-1', type === 'income' ? 'text-emerald-500' : 'text-red-500')}>{type}</span>
+            Create
+            <span className={cn('m-1', type === 'income' ? 'text-emerald-500' : 'text-red-500')}>{type}</span>
+            category
           </DialogTitle>
-          <DialogDescription>Categories are used to group your transacrtions</DialogDescription>
+          <DialogDescription>Categories are used to group your transactions</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -102,6 +112,7 @@ const CreateCateroyDialog = ({ type, successCallback }: Props) => {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="icon"
@@ -121,7 +132,7 @@ const CreateCateroyDialog = ({ type, successCallback }: Props) => {
                             </div>
                           ) : (
                             <div className="flex flex-col items-center gap-2">
-                              <CircleOff className="h-[48px] w-[48px]"></CircleOff>
+                              <CircleOff className="h-[48px] w-[48px]" />
                               <p className="text-xs text-muted-foreground">Click to select</p>
                             </div>
                           )}
@@ -138,7 +149,7 @@ const CreateCateroyDialog = ({ type, successCallback }: Props) => {
                       </PopoverContent>
                     </Popover>
                   </FormControl>
-                  <FormDescription>This is how your category will appear in the app. </FormDescription>
+                  <FormDescription>This is how your category will appear in the app</FormDescription>
                 </FormItem>
               )}
             />
@@ -147,8 +158,8 @@ const CreateCateroyDialog = ({ type, successCallback }: Props) => {
         <DialogFooter>
           <DialogClose asChild>
             <Button
-              variant={'secondary'}
               type="button"
+              variant={'secondary'}
               onClick={() => {
                 form.reset();
               }}
@@ -156,7 +167,7 @@ const CreateCateroyDialog = ({ type, successCallback }: Props) => {
               Cancel
             </Button>
           </DialogClose>
-          <Button onClick={form.handleSubmit(onSubmit)} disabled={isPending} variant={'default'}>
+          <Button onClick={form.handleSubmit(onSubmit)} disabled={isPending}>
             {!isPending && 'Create'}
             {isPending && <Loader2 className="animate-spin" />}
           </Button>
@@ -164,6 +175,6 @@ const CreateCateroyDialog = ({ type, successCallback }: Props) => {
       </DialogContent>
     </Dialog>
   );
-};
+}
 
-export default CreateCateroyDialog;
+export default CreateCategoryDialog;
