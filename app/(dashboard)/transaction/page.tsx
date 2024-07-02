@@ -3,11 +3,11 @@
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { MAX_DATE_RANGE_DAYS } from '@/lib/constants';
 import { differenceInDays, startOfMonth } from 'date-fns';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
 import TransactionTable from './_components/TransactionTable';
 
-const page = () => {
+function TransactionsPage() {
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: startOfMonth(new Date()),
     to: new Date()
@@ -16,8 +16,8 @@ const page = () => {
     <>
       <div className="border-b bg-card">
         <div className="container flex flex-wrap items-center justify-between gap-6 py-8">
-          <div className="">
-            <p className="text-3xl font-bold">Transaction history</p>
+          <div>
+            <p className="text-3xl font-bold">Transactions history</p>
           </div>
           <DateRangePicker
             initialDateFrom={dateRange.from}
@@ -25,14 +25,14 @@ const page = () => {
             showCompare={false}
             onUpdate={values => {
               const { from, to } = values.range;
-              // web update the date range only if both dates are set.
-              if (!from || !to) {
-                return;
-              }
+              // We update the date range only if both dates are set
+
+              if (!from || !to) return;
               if (differenceInDays(to, from) > MAX_DATE_RANGE_DAYS) {
-                toast.error(`The selected rate range is too big. Max allowed range s ${MAX_DATE_RANGE_DAYS} days!`);
+                toast.error(`The selected date range is too big. Max allowed range is ${MAX_DATE_RANGE_DAYS} days!`);
                 return;
               }
+
               setDateRange({ from, to });
             }}
           />
@@ -43,6 +43,6 @@ const page = () => {
       </div>
     </>
   );
-};
+}
 
-export default page;
+export default TransactionsPage;
